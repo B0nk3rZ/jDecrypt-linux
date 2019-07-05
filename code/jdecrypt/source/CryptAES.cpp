@@ -1,61 +1,84 @@
-#include <windows.h>
-#include <wincrypt.h>
+#include <cstring>
 
 #include "CryptAES.h"
 
-#pragma comment(lib, "advapi32.lib")
+void CryptAES::HandleErrors(bool dontabort)
+{
+    ERR_print_errors_fp(stderr);
+    if(!dontabort) abort();
+}
 
 CryptAES::CryptAES(BYTE *pKey, BYTE *pIV)
 {
-	this->hProv = NULL;
-	this->hKey = NULL;
+	std::memcpy(this->pKey, pKey, 16);
+	std::memcpy(this->pIV, pIV, 16);
 
-	if (CryptAcquireContext(&this->hProv, NULL, MS_ENH_RSA_AES_PROV, PROV_RSA_AES, 0))
-	{
-		AESKEY128 AESBlob;
+	if(!(this->ectx = EVP_CIPHER_CTX_new()))
+		this->HandleErrors();
 
-		for (int i = 0; i < 16; i++)
-			AESBlob.pKey[i] = pKey[i];
+	if(1 != EVP_EncryptInit_ex(this->ectx, EVP_aes_128_cbc(), NULL, this->pKey, this->pIV))
+		this->HandleErrors();
 
-		CryptImportKey(this->hProv, reinterpret_cast<BYTE*>(&AESBlob), sizeof(AESBlob), NULL, 0, &this->hKey);
+	//if(1 != EVP_CIPHER_CTX_set_padding(this->ectx, 0))
+	//	this->HandleErrors();
 
-		if (this->hKey)
-		{
-			DWORD dwMode = CRYPT_MODE_CBC,
-				dwPadding = PKCS5_PADDING;
+	if(!(this->dctx = EVP_CIPHER_CTX_new()))
+		this->HandleErrors();
 
-			CryptSetKeyParam(this->hKey, KP_IV, pIV, 0);
-			CryptSetKeyParam(this->hKey, KP_MODE, reinterpret_cast<BYTE*>(&dwMode), 0);
-			CryptSetKeyParam(this->hKey, KP_PADDING, reinterpret_cast<BYTE*>(&dwPadding), 0);
-		}
-	}
+	if(1 != EVP_DecryptInit_ex(this->dctx, EVP_aes_128_cbc(), NULL, this->pKey, this->pIV))
+		this->HandleErrors();
+
+	//if(1 != EVP_CIPHER_CTX_set_padding(this->dctx, 0))
+	//	this->HandleErrors();
 }
 
 CryptAES::~CryptAES()
 {
-	if (this->hKey != NULL) 
-		CryptDestroyKey(this->hKey);
+	if (this->ectx != NULL) 
+		EVP_CIPHER_CTX_free(this->ectx);
 
-	if (this->hProv != NULL) 
-		CryptReleaseContext(this->hProv, 0);
+	if (this->dctx != NULL) 
+		EVP_CIPHER_CTX_free(this->dctx);
 }
 
 int CryptAES::Encrypt(BYTE *pData, DWORD *pdwDataSize, DWORD dwBufferSize, BOOL bFinal)
 {
-	if (this->hKey == NULL)
+	int len;
+	this->ciphertext = new BYTE[*pdwDataSize];
+
+	if (this->pKey == NULL)
 		return -1;
 
-	CryptEncrypt(this->hKey, 0, bFinal, 0, pData, pdwDataSize, dwBufferSize);
+	if(1 != EVP_EncryptUpdate(this->ectx, this->ciphertext, &len, pData, *pdwDataSize))
+		this->HandleErrors(true);
+	this->clen = len;
 
-	return GetLastError();
+	if(bFinal && (1 != EVP_EncryptFinal_ex(this->ectx, this->ciphertext + this->clen, &len)))
+		this->HandleErrors(true);
+	this->clen += len;
+
+	std::memcpy(pData, this->ciphertext, this->clen);
+
+	return ERR_peek_last_error();
 }
 
 int CryptAES::Decrypt(BYTE *pData, DWORD *pdwDataSize, BOOL bFinal)
 {
-	if (this->hKey == NULL)
+	int len;
+	this->plaintext = new BYTE[(*pdwDataSize)+16];
+
+	if (this->pKey == NULL)
 		return -1;
 
-	CryptDecrypt(this->hKey, 0, bFinal, 0, pData, pdwDataSize);
+	if(1 != EVP_DecryptUpdate(this->dctx, this->plaintext, &len, pData, *pdwDataSize))
+		this->HandleErrors(true);
+	this->plen = len;
 
-	return GetLastError();
+	if(bFinal && (1 != EVP_DecryptFinal_ex(this->dctx, this->plaintext + this->plen, &len)))
+		this->HandleErrors(true);
+	//this->plen += len;
+
+	std::memcpy(pData, this->plaintext, this->plen);
+
+	return ERR_peek_last_error();
 }

@@ -1,15 +1,16 @@
 #include <ctime>
 #include <sstream>
 
+#include "Types.h"
 #include "JDecrypt.h"
 #include "HTMLHeaderImage.h"
 
 BYTE pKEY[8][16] =
 { 
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 1, 6, 4, 5, 2, 7, 4, 3, 12, 61, 14, 75, -2, -7, -44, 33 },	// AccountSettings.java
-	{ 2, 4, 4, 5, 2, 7, 4, 3, 12, 61, 14, 75, -2, -7, -44, 33 },	// AuthenticationControllerSettings.java
-	{ 1, 3, 17, 1, 1, 84, 1, 1, 1, 2, -63, 1, 17, 1, 34, -12 },		// ProxySelectorImpl.java
+	{ 1, 6, 4, 5, 2, 7, 4, 3, 12, 61, 14, 75, 254, 249, 212, 33 },	// AccountSettings.java
+	{ 2, 4, 4, 5, 2, 7, 4, 3, 12, 61, 14, 75, 254, 249, 212, 33 },	// AuthenticationControllerSettings.java
+	{ 1, 3, 17, 1, 1, 84, 1, 1, 1, 2, 193, 1, 17, 1, 34, 244 },		// ProxySelectorImpl.java
 	{ 1, 3, 17, 1, 1, 84, 1, 1, 1, 1, 18, 1, 1, 1, 34, 1 },			// CrawlerPluginController.java
 	{ 1, 2, 17, 1, 1, 84, 1, 1, 1, 1, 18, 1, 1, 1, 34, 1 },			// JSonStorage.java, SubConfiguration.java
 	{ 0, 2, 17, 1, 1, 84, 2, 1, 1, 1, 18, 1, 1, 1, 18, 1 },			// ExtFileChooseIdConfig.java	

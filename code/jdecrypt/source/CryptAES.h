@@ -1,30 +1,24 @@
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
 
+#include "Types.h"
 class CryptAES 
 {
 
 private:
+	BYTE pKey[16];
+	BYTE pIV[16];
+	EVP_CIPHER_CTX* ectx;
+	EVP_CIPHER_CTX* dctx;
+	BYTE* plaintext;
+	int plen;
+	BYTE* ciphertext;
+	int clen;
 
-	HCRYPTPROV hProv;
-	HCRYPTKEY  hKey;
+	void HandleErrors(bool dontabort=false);
 
 public:
-
-	struct AESKEY128 
-	{
-		BLOBHEADER Header;
-		DWORD dwKeyLen;
-		BYTE pKey[16];
-
-		AESKEY128()
-		{
-			this->Header.bType = PLAINTEXTKEYBLOB;
-			this->Header.bVersion = CUR_BLOB_VERSION;
-			this->Header.reserved = 0;
-			this->Header.aiKeyAlg = CALG_AES_128;
-			this->dwKeyLen = 16;
-		}
-	};
-
 	~CryptAES();
 	CryptAES(BYTE *pKey, BYTE *pIV);
 	
