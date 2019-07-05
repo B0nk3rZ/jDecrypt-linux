@@ -1,4 +1,5 @@
 #include <ctime>
+#include <string>
 #include <sstream>
 
 #include "Types.h"
@@ -38,10 +39,12 @@ void WriteOutputToFile(const string &strOutput, bool bHTML)
 	/* Write to file */
 
 	char pTimeBuf[20];
-	tm timeinfo; time_t rawtime;
+	tm* timeinfo;
+	time_t rawtime;
 
-	time(&rawtime); localtime_s(&timeinfo, &rawtime);
-	size_t ret = strftime(pTimeBuf, 20, "%d-%m-%Y_%H-%M-%S", &timeinfo);
+	time(&rawtime);
+	timeinfo = localtime(&rawtime);
+	size_t ret = strftime(pTimeBuf, 20, "%d-%m-%Y_%H-%M-%S", timeinfo);
 
 	string strFileName = bHTML ?
 		string("jdecrypt_export_").append(pTimeBuf).append(".html") :
