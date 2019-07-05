@@ -77,8 +77,8 @@ int main(int argc, char **argv)
 void PrintUsage(const char *pFileName)
 {
 	cout
-		<< "Coded bY S3RB31" << endl << endl
-		<< "Usage: \t\t" << pFileName << ".exe [ARGS] [FILE]" << endl << endl
+		<< "Coded bY S3RB31" << endl << "Linux port by B0nk3rZ" << endl << endl
+		<< "Usage: \t\t" << pFileName << " [ARGS] [FILE]" << endl << endl
 		<< "-html \t\t- Export to HTML (only AccountSettings.accounts.ejs)" << endl
 		<< "-keyid [KeyID]\t- Set AES Key (1-7, 1 = default)" << endl
 		<< "-noiv \t\t- Use zero as IV" << endl
@@ -89,12 +89,12 @@ void PrintKeys()
 {
 	cout
 		<< "Keys:" << endl
-		<< "1: { 1, 6,  4, 5, 2,  7, 4, 3, 12, 61,  14, 75, -2, -7, -44,  33 } - AccountSettings.java" << endl
-		<< "2: { 2, 4,  4, 5, 2,  7, 4, 3, 12, 61,  14, 75, -2, -7, -44,  33 } - AuthenticationControllerSettings.java" << endl
-		<< "3: { 1, 3, 17, 1, 1, 84, 1, 1,  1,  2, -63,  1, 17,  1,  34, -12 } - ProxySelectorImpl.java" << endl
-		<< "4: { 1, 3, 17, 1, 1, 84, 1, 1,  1,  1,  18,  1,  1,  1,  34,   1 } - CrawlerPluginController.java" << endl
-		<< "5: { 1, 2, 17, 1, 1, 84, 1, 1,  1,  1,  18,  1,  1,  1,  34,   1 } - JSonStorage.java, SubConfiguration.java" << endl
-		<< "6: { 0, 2, 17, 1, 1, 84, 2, 1,  1,  1,  18,  1,  1,  1,  18,   1 } - ExtFileChooseIdConfig.java" << endl
-		<< "7: { 0, 1,  2, 3, 4,  5, 6, 7,  8,  9,  10, 11, 12, 13,  14,  15 } - DownloadLinkStorable.java" << endl;
+		<< "1: { 1, 6, 4,  5, 2, 7,  4, 3, 12, 61, 14,  75, 254, 249, 212, 33  } - AccountSettings.java" << endl
+		<< "2: { 2, 4, 4,  5, 2, 7,  4, 3, 12, 61, 14,  75, 254, 249, 212, 33  } - AuthenticationControllerSettings.java" << endl
+		<< "3: { 1, 3, 17, 1, 1, 84, 1, 1, 1,  2,  193, 1,  17,  1,   34,  244 } - ProxySelectorImpl.java" << endl
+		<< "4: { 1, 3, 17, 1, 1, 84, 1, 1, 1,  1,  18,  1,  1,   1,   34,  1   } - CrawlerPluginController.java" << endl
+		<< "5: { 1, 2, 17, 1, 1, 84, 1, 1, 1,  1,  18,  1,  1,   1,   34,  1   } - JSonStorage.java, SubConfiguration.java" << endl
+		<< "6: { 0, 2, 17, 1, 1, 84, 2, 1, 1,  1,  18,  1,  1,   1,   18,  1   } - ExtFileChooseIdConfig.java" << endl
+		<< "7: { 0, 1,  2, 3, 4,  5, 6, 7, 8,  9,  10,  11, 12,  13,  14,  15  } - DownloadLinkStorable.java" << endl;
 }
 
