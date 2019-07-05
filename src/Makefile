@@ -7,3 +7,7 @@ jdecrypt: *.cpp
 
 clean:
 	rm jdecrypt
+
+install:
+	install -m 0755 jdecrypt /usr/local/bin/
+
