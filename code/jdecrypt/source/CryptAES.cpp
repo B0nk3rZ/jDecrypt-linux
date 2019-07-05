@@ -44,7 +44,8 @@ CryptAES::~CryptAES()
 int CryptAES::Encrypt(BYTE *pData, DWORD *pdwDataSize, DWORD dwBufferSize, BOOL bFinal)
 {
 	int len;
-	this->ciphertext = new BYTE[*pdwDataSize];
+	if(this->ciphertext == NULL)
+		this->ciphertext = new BYTE[(*pdwDataSize)+16];
 
 	if (this->pKey == NULL)
 		return -1;
@@ -58,6 +59,7 @@ int CryptAES::Encrypt(BYTE *pData, DWORD *pdwDataSize, DWORD dwBufferSize, BOOL 
 	this->clen += len;
 
 	std::memcpy(pData, this->ciphertext, this->clen);
+	*pdwDataSize = this->clen;
 
 	return ERR_peek_last_error();
 }
@@ -65,7 +67,8 @@ int CryptAES::Encrypt(BYTE *pData, DWORD *pdwDataSize, DWORD dwBufferSize, BOOL 
 int CryptAES::Decrypt(BYTE *pData, DWORD *pdwDataSize, BOOL bFinal)
 {
 	int len;
-	this->plaintext = new BYTE[(*pdwDataSize)+16];
+	if(this->plaintext == NULL)
+		this->plaintext = new BYTE[*pdwDataSize];
 
 	if (this->pKey == NULL)
 		return -1;
@@ -76,9 +79,10 @@ int CryptAES::Decrypt(BYTE *pData, DWORD *pdwDataSize, BOOL bFinal)
 
 	if(bFinal && (1 != EVP_DecryptFinal_ex(this->dctx, this->plaintext + this->plen, &len)))
 		this->HandleErrors(true);
-	//this->plen += len;
+	this->plen += len;
 
 	std::memcpy(pData, this->plaintext, this->plen);
+	*pdwDataSize = this->plen;
 
 	return ERR_peek_last_error();
 }

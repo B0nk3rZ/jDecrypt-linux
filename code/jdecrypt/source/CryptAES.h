@@ -11,9 +11,9 @@ private:
 	BYTE pIV[16];
 	EVP_CIPHER_CTX* ectx;
 	EVP_CIPHER_CTX* dctx;
-	BYTE* plaintext;
+	BYTE* plaintext = NULL;
 	int plen;
-	BYTE* ciphertext;
+	BYTE* ciphertext = NULL;
 	int clen;
 
 	void HandleErrors(bool dontabort=false);
