@@ -17,15 +17,17 @@ BYTE pKEY[8][16] =
 };
 
 template<typename T>
-void ReturnError(int retcode, T err, char *func, bool bHex)
+void ReturnError(int retcode, T err, const char* func, bool bHex)
 {
 	if (bHex)
 	{
 		cout.setf(ios_base::showbase);
 		cout.setf(ios::hex, ios::basefield);
 	}
-		
-	cout << "Error " << err << " from \"" << func << "\"" << endl;
+	if constexpr(std::is_same<T, DWORD>::value)
+		cout << "Error " << err << " from \"" << func << "\": " << strerror(err) << endl;
+	else
+		cout << "Error " << err << " from \"" << func << "\"" << endl;
 	
 	exit(retcode);
 }
@@ -44,7 +46,7 @@ void WriteOutputToFile(const string &strOutput, bool bHTML)
 		string("jdecrypt_export_").append(pTimeBuf).append(".html") :
 		string("jdecrypt_raw_").append(pTimeBuf).append(".json");
 
-	FileIO output(strFileName.c_str(), GENERIC_WRITE, CREATE_ALWAYS);
+	FileIO output(strFileName.c_str(), ios::out | ios::trunc);
 
 	if (!output.open())
 		ReturnError(5, output.getError(), "input.open()");
@@ -59,7 +61,7 @@ string ReadAndDecryptEJS(string strFile, int iKeyID, bool bNoIV)
 {
 	/* Read data */
 
-	FileIO input(strFile.c_str(), GENERIC_READ, OPEN_EXISTING);
+	FileIO input(strFile.c_str(), ios::in);
 
 	if (!input.open())
 		ReturnError(2, input.getError(), "input.open()");

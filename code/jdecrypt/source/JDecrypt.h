@@ -1,10 +1,9 @@
 #include <string>
-#include <windows.h>
 
 using namespace std;
 
 template<typename T> 
-void ReturnError(int retcode, T err, char *func, bool bHex = false);
+void ReturnError(int retcode, T err, const char* func, bool bHex = false);
 
 #include "FileIO.h"
 

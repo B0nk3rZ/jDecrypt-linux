@@ -1,20 +1,22 @@
+#include <iostream>
+#include <fstream>
 
+#include "Types.h"
 class FileIO
 {
 
 private:
 
-	HANDLE hFile;
+	std::fstream sFile;
 	const char *pName;
+	std::ios_base::openmode mode;
 
 	DWORD dwError;
-	DWORD dwAccess, dwMode;
-	DWORD dwShareMode, dwFlags;
 
 public:
 
 	~FileIO();
-	FileIO(const char *pName, DWORD dwAccess, DWORD dwMode, DWORD dwShareMode = 0, DWORD dwFlags = 0);
+	FileIO(const char *pName, std::ios_base::openmode mode);
 
 	bool open();
 	bool read(BYTE *pData, DWORD dwBufSize, DWORD &dwPos);

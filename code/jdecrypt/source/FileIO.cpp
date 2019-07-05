@@ -1,25 +1,26 @@
-#include <windows.h>
+#include <errno.h>
 #include "FileIO.h"
 
-FileIO::FileIO(const char *pName, DWORD dwAccess, DWORD dwMode, DWORD dwShareMode, DWORD dwFlags)
-	: pName(pName), dwAccess(dwAccess), dwMode(dwMode), dwShareMode(dwShareMode), dwFlags(dwFlags) { }
+FileIO::FileIO(const char *pName, std::ios_base::openmode mode)
+	: pName(pName), mode(mode) { }
 
 FileIO::~FileIO()
 {
 	if (this->pName)
 		this->pName = 0;
 
-	if (this->hFile)
-		CloseHandle(this->hFile);
+	if (this->sFile.is_open()){
+		this->sFile.clear();
+		this->sFile.close();
+	}
 }
 
 bool FileIO::open()
 {
-	this->hFile = CreateFileA(this->pName, this->dwAccess, this->dwShareMode, 0, this->dwMode, this->dwFlags, 0);
+	this->sFile.open(this->pName, this->mode);
 
-	if (this->hFile == INVALID_HANDLE_VALUE)
-	{
-		this->dwError = GetLastError();
+	if(!this->sFile.is_open()){
+		this->dwError = errno;
 		return false;
 	}
 
@@ -28,34 +29,23 @@ bool FileIO::open()
 
 bool FileIO::read(BYTE *pData, DWORD dwBufSize, DWORD &dwPos)
 {
-	if (pData == NULL)
-		return false;
-
-	if (this->dwAccess &= ~GENERIC_READ)
-	{
-		this->dwError = ERROR_ACCESS_DENIED;
+	if (pData == NULL){
+		this->dwError = EINVAL;
 		return false;
 	}
 
-	if (SetFilePointer(this->hFile, dwPos, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
-	{
-		this->dwError = GetLastError();
-		return false;
+	this->sFile.seekg(dwPos);
+
+	this->sFile.read((char*)pData, dwBufSize);
+
+	dwPos = this->sFile.tellg();
+
+	if(this->sFile.eof()){
+		return true;
 	}
 
-	DWORD dwRead = 0;
-
-	if (!ReadFile(hFile, pData, dwBufSize, &dwRead, 0))
-	{
-		this->dwError = GetLastError();
-		return false;
-	}
-
-	dwPos += dwRead;
-
-	if (dwRead < dwBufSize)
-	{
-		this->dwError = GetLastError();
+	if(this->sFile.bad()){
+		this->dwError = errno;
 		return false;
 	}
 
@@ -67,40 +57,29 @@ bool FileIO::write(const BYTE *pData, DWORD dwBufSize, DWORD &dwPos)
 	if (pData == NULL)
 		return false;
 
-	if (this->dwAccess &= ~GENERIC_WRITE)
-	{
-		this->dwError = ERROR_ACCESS_DENIED;
+	this->sFile.seekp(dwPos);
+
+	this->sFile.write((char*)pData, dwBufSize);
+
+	if(this->sFile.bad()){
+		this->dwError = errno;
 		return false;
 	}
 
-	if (SetFilePointer(this->hFile, dwPos, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
-	{
-		this->dwError = GetLastError();
-		return false;
-	}
-
-	DWORD dwWritten = 0;
-
-	if (!WriteFile(hFile, pData, dwBufSize, &dwWritten, 0))
-	{
-		this->dwError = GetLastError();
-		return false;
-	}
-
-	dwPos += dwWritten;
-
-	if (dwWritten != dwBufSize)
-	{
-		this->dwError = GetLastError();
-		return false;
-	}
+	dwPos = this->sFile.tellp();
 
 	return true;
 }
 
 size_t FileIO::getSize()
 {
-	return GetFileSize(this->hFile, 0);
+	if(!this->sFile.is_open())
+		return INVALID_FILE_SIZE;
+	std::streampos sp = this->sFile.tellg();
+	this->sFile.seekg(0, std::ios::end);
+	size_t size = this->sFile.tellg();
+	this->sFile.seekg(sp);
+	return size;
 }
 
 DWORD FileIO::getError()
