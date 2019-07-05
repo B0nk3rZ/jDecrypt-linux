@@ -146,7 +146,7 @@ string BuildHTMLExport(vector<JHost> vHosts)
 	sstrSize << vHosts.size();
 
 	string strHTML = 
-		string("<html>\r\n<head>\r\n<meta http-equiv=\"content-type\" content=\"text/html; charset=ISO-8859-1\">\r\n<title>jDecrytp - ")
+		string("<html>\r\n<head>\r\n<meta http-equiv=\"content-type\" content=\"text/html; charset=ISO-8859-1\">\r\n<title>jDecrypt - ")
 		.append(sstrSize.str())
 		.append(" Host Entry/ies</title>\r\n<style type=\"text/css\">\r\n#logo { margin:5% auto; background: url(data:image/png;base64,")
 		.append(HTMLHeaderImage)
