@@ -3,7 +3,7 @@ CPPFLAGS=-std=c++17 -Os
 LDFLAGS=-lcrypto
 
 jdecrypt: *.cpp
-	$(CXX) $(CPPFLAGS) $(LDFLAGS) -o $@ $^
+	$(CXX) $(CPPFLAGS) -o $@ $^ $(LDFLAGS)
 
 clean:
 	rm jdecrypt
